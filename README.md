@@ -13,9 +13,9 @@ end point login de usuario http://localhost:8080/auth/login (POST)
 
 end point lista de peliculas http://localhost:8080/movies/list (GET)
 
-end point lista de funciones http://localhost:8080/function-movie/list
+end point lista de funciones http://localhost:8080/function-movie/list (GET)
 
-end point lista de peliculas funcion http://localhost:8080/function-movie/{1} (GET)
+end point lista de funcion http://localhost:8080/function-movie/{1} (GET)
 
 end point sillas disponibles por funcion http://localhost:8080/function-movie/available-chairs/{idFuncion} (GET)
 
