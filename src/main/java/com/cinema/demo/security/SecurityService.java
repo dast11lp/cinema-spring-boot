@@ -23,8 +23,6 @@ public class SecurityService {
     Authentication authentication;
 
         public boolean hasUser(Long idUser) throws Exception{
-        	
-        System.out.println("hola " + idUser);
 
         MyUser user = this.myUserService.findById(idUser);
         
@@ -40,7 +38,7 @@ public class SecurityService {
 			if(authoritiesContext.contains(authority)) {
 				return true;
 			}
-			break;
+//			break;
 		}
         
 

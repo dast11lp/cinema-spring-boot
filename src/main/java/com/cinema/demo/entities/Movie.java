@@ -23,7 +23,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ser.impl.SimpleBeanPropertyFilter;
 import com.fasterxml.jackson.databind.ser.impl.SimpleFilterProvider;
 
-@Entity(name="movies")
+@Entity(name="movie")
 @JsonFilter("userFilter")
 public class Movie {
 	
@@ -44,7 +44,7 @@ public class Movie {
 	@Column(name="country_mov")
 	private String Country;
 	
-	@Column(name="director")
+	@Column(name="director_mov")
 	private String director;
 	
 	@Column(name="protagonists_mov")
@@ -53,7 +53,11 @@ public class Movie {
 	@Column(name="language_mov")
 	private String language;
 	
-
+	@JsonIgnoreProperties({"movie","hibernateLazyInitializer","handler"})
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "movie")
+	private List<FunctionMovie> functionMovie;
+	
+	
 	public String getDirector() {
 		return director;
 	}
@@ -94,9 +98,7 @@ public class Movie {
 	}
 
 
-	@JsonIgnoreProperties({"movie","hibernateLazyInitializer","handler"})
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "movie")
-	private List<FunctionMovie> functionMovie;
+	
 
 
 	public Long getId() {

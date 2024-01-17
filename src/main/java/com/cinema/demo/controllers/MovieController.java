@@ -49,17 +49,4 @@ public class MovieController {
 
         return mappingJacksonValue;
     }
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 }

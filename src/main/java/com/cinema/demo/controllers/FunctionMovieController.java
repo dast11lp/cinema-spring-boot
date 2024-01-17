@@ -34,12 +34,12 @@ public class FunctionMovieController {
 		
 		FunctionMovie functionMovie = this.functionMovieService.findById(idFunMov);
 		
-		return ResponseEntity.ok(functionMovie.getFunctionChairs());
+		//return ResponseEntity.ok(functionMovie.getFunctionChairs());
+		return null;
 	}
 	
-	
 	@GetMapping("{id}")
-	public ResponseEntity<MappingJacksonValue> listTest(@PathVariable Long id){
+	public ResponseEntity<MappingJacksonValue> listFunctionsPerMovie(@PathVariable Long id){
 		
 			 SimpleBeanPropertyFilter simpleBeanPropertyFilter =
 		                SimpleBeanPropertyFilter.serializeAllExcept();
@@ -60,6 +60,11 @@ public class FunctionMovieController {
 	@GetMapping("list")
 	public ResponseEntity<List<FunctionMovie>> listFunctios(){
 		return ResponseEntity.ok(this.functionMovieService.findAll());
+	}
+	
+	@GetMapping("test/{id}")
+	public ResponseEntity<?> oneFunctionMovie(@PathVariable Long id) {
+		return ResponseEntity.ok(this.functionMovieService.findById(id));
 	}
 	
 }

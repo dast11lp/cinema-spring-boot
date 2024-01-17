@@ -1,5 +1,7 @@
 package com.cinema.demo.entities;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,35 +15,45 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
+import javax.persistence.PrePersist;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-@Entity(name="function_reservation")
+@Entity(name = "function_reservation")
 public class FunctionReservation {
-	
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="id_fun_res")
+	@Column(name = "id_fun_res")
 	private Long id;
+
+	@Column(name = "date_res")
+	private LocalDateTime dateRes;
 	
-	
-	@JsonIgnoreProperties({"funReservation","hibernateLazyInitializer","handler"})
+	@Column (name ="total_mou_res")
+	private Double totalMount;
+
+	@JsonIgnoreProperties({ "funReservation", "hibernateLazyInitializer", "handler" })
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="id_use")
+	@JoinColumn(name = "id_use")
 	private MyUser myUser;
-	
-	@JsonIgnoreProperties({"reservationFuntions","hibernateLazyInitializer","handler"})
+
+	@JsonIgnoreProperties({ "reservationFuntions", "hibernateLazyInitializer", "handler" })
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="id_fuc")
+	@JoinColumn(name = "id_fun")
 	private FunctionMovie functionMovie;
-	
-	
-	@JsonIgnoreProperties({"functionReservation","hibernateLazyInitializer","handler"})
+
+	@JsonIgnoreProperties({ "functionReservation", "hibernateLazyInitializer", "handler" })
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "functionReservation")
 	private List<FunctionChair> functionChairs = new ArrayList<FunctionChair>();
-
 	
+    @PrePersist
+    public void prePersist() {
+        if (dateRes == null) {
+            dateRes = LocalDateTime.now();
+        }
+    }
 
 	public Long getId() {
 		return id;
@@ -51,8 +63,20 @@ public class FunctionReservation {
 		this.id = id;
 	}
 
-	public FunctionMovie getFunctionMovie() {
-		return functionMovie;
+	public LocalDateTime getDateRes() {
+		return dateRes;
+	}
+
+	public void setDateRes(LocalDateTime dateRes) {
+		this.dateRes = dateRes;
+	}
+
+	public Double getTotalMount() {
+		return totalMount;
+	}
+
+	public void setTotalMount(Double totalMount) {
+		this.totalMount = totalMount;
 	}
 
 	public MyUser getMyUser() {
@@ -61,6 +85,10 @@ public class FunctionReservation {
 
 	public void setMyUser(MyUser myUser) {
 		this.myUser = myUser;
+	}
+
+	public FunctionMovie getFunctionMovie() {
+		return functionMovie;
 	}
 
 	public void setFunctionMovie(FunctionMovie functionMovie) {
@@ -74,7 +102,5 @@ public class FunctionReservation {
 	public void setFunctionChairs(List<FunctionChair> functionChairs) {
 		this.functionChairs = functionChairs;
 	}
-	
-	
-	
+
 }

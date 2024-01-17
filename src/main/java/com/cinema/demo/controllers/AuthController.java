@@ -53,6 +53,7 @@ public class AuthController {
 		user.setPassword(encodedPass);
 		user = myUserService.save(user);
 		
+		
 		Role role = new Role();
 		role.setAuthority("ROLE_USER_" + user.getIdUser());
 		
@@ -80,18 +81,24 @@ public class AuthController {
 			try {
 				UsernamePasswordAuthenticationToken authInputToken = new UsernamePasswordAuthenticationToken(body.getUsername(), body.getPassword());
 				
+				MyUser user = myUserService.findByUser(body.getUsername());
+				
 				this.authenticationManager.authenticate(authInputToken);
 				
 				HttpHeaders headers = new HttpHeaders();
 				
 				String token = jwtUtil.JwtGenerator(body.getUsername());
 				
-				Map<String, String> tokens = new HashMap<>();
-				tokens.put("Authorization", token);
+				Map<String, Object> userInfo = new HashMap<>();
+				userInfo.put("Authorization", token);
+				
+				userInfo.put("userData", user);
 				
 				headers.set("Authorization", token);
 				
-				return  ResponseEntity.ok().headers(headers).body(tokens);
+				
+
+				return  ResponseEntity.ok().headers(headers).body(userInfo);
 			} catch (Exception e) {
 				log.error(e.toString());
 				return ResponseEntity.ok().body("Usuario o Contraseña incorrectos");

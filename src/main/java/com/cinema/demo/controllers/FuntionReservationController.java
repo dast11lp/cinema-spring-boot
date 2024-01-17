@@ -1,6 +1,8 @@
 package com.cinema.demo.controllers;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Function;
 
@@ -9,6 +11,8 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.json.MappingJacksonValue;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,9 +31,12 @@ import com.cinema.demo.entities.FunctionMovie;
 import com.cinema.demo.entities.FunctionReservation;
 import com.cinema.demo.entities.Movie;
 import com.cinema.demo.entities.MyUser;
+import com.cinema.demo.models.Reservation;
 import com.cinema.demo.models.Ticket;
 import com.cinema.demo.repositories.FunctionChairRepository;
+import com.cinema.demo.repositories.FunctionReservationRepository;
 import com.cinema.demo.services.CardService;
+import com.cinema.demo.services.FunctionChairService;
 import com.cinema.demo.services.FunctionMovieService;
 import com.cinema.demo.services.FunctionReservationService;
 import com.cinema.demo.services.MovieService;
@@ -58,77 +65,128 @@ public class FuntionReservationController {
 	private FunctionMovieService funcMovSer;
 
 	@Autowired
-	private CardService cardService;
-	
+	private FunctionChairService chairService;
+
 	@Autowired
-	private FunctionChairRepository functionchairRepository;
-	
-	@PostMapping("/create-functionmovie/{idFunMov}/id-card/{idCard}")
-	public ResponseEntity<?> create(@RequestBody FunctionChair functionChair, @PathVariable Long idUser,@PathVariable Long idFunMov, @PathVariable Long idCard) {
+	private FunctionReservationRepository functionReservationRepository;
+
+	@PostMapping("/reserve-function-movie")
+	public ResponseEntity<?> create(@RequestBody Reservation reservation, @PathVariable Long idUser) {
 
 		MyUser user = this.myUserService.findById(idUser);
 		if (user == null)
 			return ResponseEntity.ok("el usuario no se encuentra en nuestros registros");
 
-		Card card = this.cardService.findById(idCard);
-		if (card == null)
-			return ResponseEntity.ok("la tarjeta no se encuentra registrada");
-
-		FunctionMovie funMovie = this.funcMovSer.findById(idFunMov);
-		if (funMovie == null)
-			return ResponseEntity.ok("la pélicula no se encuentra en los registros");
-
-		FunctionMovie functiMovie = this.funcMovSer.findById(idFunMov);
+		FunctionMovie functiMovie = this.funcMovSer.findById(reservation.getIdFunMov());
 		if (functiMovie == null)
-			return ResponseEntity.ok("no existe registro de tal función");
+			return ResponseEntity.ok("no existe registro de la función solicitada");
 
-		List<FunctionChair> listfunChairs = functiMovie.getFunctionChairs();
-		if (listfunChairs == null || listfunChairs.isEmpty())
-			return ResponseEntity.ok("la sala no registra sillas");
-
-		System.out.println("test0");
-		for (FunctionChair funChair : listfunChairs) {
-			System.err.println(funChair.getId());
-			if (funChair.getNumberChair().equals(functionChair.getNumberChair())) {
-				if (funChair.getAvailable().equals(true)) {
-					System.err.println("acá tambien");
-					
-					
-					FunctionReservation funReservation = new FunctionReservation();
-					
-					funChair.setFunctionReservation(funReservation);
-					funChair.setAvailable(false);
-					
-					this.funcResSer.save(funReservation);
-					
-					System.err.println("estoy por dentro "+funChair.getAvailable());
-					
-					this.functionchairRepository.save(funChair);
-					
-
-	
-					funReservation.setMyUser(user);
-			
-					this.myUserService.save(user);
-			
-					Ticket ticketByUser = new Ticket(functionChair.getNumberChair(), user.getIdUser(),
-							user.getUsername(), functiMovie);
-			
-					return ResponseEntity.ok(ticketByUser);
-				}
-			}
-
-			}
+		List<FunctionChair> listFunctionChair = new ArrayList<>();
 		
-		return ResponseEntity.ok("jejeje");
+		
+
+		FunctionChair functionChair = null;
+
+		for (Long idChair : reservation.getFunctionChairs()) {
+
+			functionChair = this.chairService.findById(idChair);
+
+			if (functionChair == null)
+				return ResponseEntity.ok("una silla no se encuentra registrada");
+			else if (functionChair.getAvailable() == false) {
+				return ResponseEntity.ok("al menos una silla ya se encuentra ocupada");
+			} else {
+				listFunctionChair.add(functionChair);
+			}
+
+		}
+		com.cinema.demo.entities.Function function = functiMovie.getFunction();
+
+		FunctionReservation functionReservation = new FunctionReservation();
+		functionReservation.setFunctionMovie(functiMovie);
+		functionReservation.setTotalMount(function.getPriceTicket() * reservation.getFunctionChairs().size()  );
+		functionReservation.setMyUser(user);
+
+		this.funcResSer.save(functionReservation);
+
+		for (FunctionChair chair : listFunctionChair) {
+			chair.setFunctionReservation(functionReservation);
+			chair.setAvailable(false);
+		}
+		
+		functionReservation.setFunctionChairs(listFunctionChair);
+
+		this.chairService.saveAll(listFunctionChair);
+
+		List<Integer> listChairs = new ArrayList<>();
+
+		listFunctionChair.forEach(chair -> listChairs.add(chair.getNumberChair()));
+
+		
+		
+
+		Ticket ticket = new Ticket(listChairs, idUser, user.getUsername(), function.getDate(), functionReservation.getDateRes(), function.getRoom(), 0.0,
+				functionReservation.getId(), functiMovie.getMovie().getMovieName(), function.getPriceTicket() * listChairs.size());
+
+		return ResponseEntity.ok(ticket);
+
+	}
+
+	@GetMapping("getMyReserveIds")
+	public ResponseEntity<?> getMyReserves(@PathVariable Long idUser) {
+		MyUser user = this.myUserService.findById(idUser);
+
+		if (user == null)
+			return ResponseEntity.ok("el usuario no existe");
+
+		List<FunctionReservation> funcReservations = user.getFunReservation();
+
+		if (funcReservations.isEmpty())
+			return ResponseEntity.ok("El usuario no cuenta con reservaciones");
+
+		List<Long> reservationIds = new ArrayList<>();
+
+		funcReservations.forEach(f -> reservationIds.add(f.getId()));
+
+		return ResponseEntity.ok(reservationIds);
+	}
+
+	@GetMapping("getReserve/{idFuncRes}")
+	public ResponseEntity<?> getMyUniqueReserve(@PathVariable Long idUser, @PathVariable Long idFuncRes) {
+
+		MyUser user = this.myUserService.findById(idUser);
+		if (user == null)
+			return ResponseEntity.ok("el usuario no existe");
+
+		List<FunctionReservation> myFunctionReservations = this.functionReservationRepository.findByMyUser(user);
+		
+		if (myFunctionReservations.isEmpty()) {
+			return ResponseEntity.ok("El usuario no tiene reservas");
+		}
+		
+		FunctionReservation funReservation = null;
+		
+		for(FunctionReservation funRes: myFunctionReservations) {
+			if (funRes.getId().equals(idFuncRes)) {
+				funReservation = funRes;
+			}
+		}
+		
+		List<Integer> chairs = new ArrayList<>();
+		
+
+		return ResponseEntity.ok(funReservation);
 	}
 	
 	
-	
+	@GetMapping("getReservesPages")
+	public ResponseEntity<?> getMyUniqueReservePage (@PageableDefault(page = 0, size = 1) Pageable pageable, @PathVariable Long idUser) {
+		return ResponseEntity.ok(this.functionReservationRepository.findAll(pageable));
+	}
+
 	@GetMapping("list")
-	public ResponseEntity<?> list(@PathVariable Long idUser ){
+	public ResponseEntity<?> list(@PathVariable Long idUser) {
 		return ResponseEntity.ok(this.funcResSer.findById((long) 26).getFunctionChairs());
 	}
-
 
 }

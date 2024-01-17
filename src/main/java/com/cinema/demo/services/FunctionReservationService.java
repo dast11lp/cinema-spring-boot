@@ -7,6 +7,7 @@ import org.springframework.stereotype.Service;
 
 import com.cinema.demo.entities.Card;
 import com.cinema.demo.entities.FunctionReservation;
+import com.cinema.demo.entities.MyUser;
 import com.cinema.demo.repositories.CardRepository;
 import com.cinema.demo.repositories.FunctionReservationRepository;
 
@@ -32,6 +33,10 @@ public class FunctionReservationService {
 	
 	public void save(FunctionReservation funRes) {
 		this.funResRepo.save(funRes);
+	}
+	
+	public List<FunctionReservation> findByMyUser(MyUser myUser) {
+		return this.funResRepo.findByMyUser(myUser);
 	}
 
 }

@@ -1,14 +1,21 @@
 spring:
       datasource:
-                url: jdbc:mysql://localhost/my_cine3
-                username: root
-                password: 
-                driver-class-name: com.mysql.cj.jdbc.Driver
+                url: jdbc:postgresql://localhost:5432/cineTest
+                username: postgres
+                password: whatisbeyond
+                driver-class-name: org.postgresql.Driver
       jpa:
-          database-platform: org.hibernate.dialect.MySQL8Dialect
+          database-platform: org.hibernate.dialect.PostgreSQLDialect
+      data:
+        web:
+          pageable:
+            one-indexed-parameters: true
+      jackson:
+        time-zone: UTC
+        date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ
 logging:
         level:
               org:
                   hibernate:
-                            SQL: debug
+                            SQL: DEBUG
 

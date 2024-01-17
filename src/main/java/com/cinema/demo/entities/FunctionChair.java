@@ -25,18 +25,18 @@ public class FunctionChair {
 	
 	@Column(name="available_fun_cha")
 	private Boolean available;
-	
-	@JsonIgnore
-	@JsonIgnoreProperties({"functionChairs","hibernateLazyInitializer","handler"})
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name="id_fun_mov")
-	private FunctionMovie functionMovie;
+
 	
 	@JsonIgnore
 	@JsonIgnoreProperties({"funReservation","hibernateLazyInitializer","handler"})
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name="id_fun_res")
 	private FunctionReservation functionReservation;
+	
+	@JsonIgnore
+	@JoinColumn(name="id_fun_mov")
+	@ManyToOne(fetch = FetchType.LAZY)
+	private Function function;
 
 	public Long getId() {
 		return id;
@@ -54,13 +54,6 @@ public class FunctionChair {
 		this.numberChair = numberChair;
 	}
 
-	public FunctionMovie getFunctionMovie() {
-		return functionMovie;
-	}
-
-	public void setFunctionMovie(FunctionMovie functionMovie) {
-		this.functionMovie = functionMovie;
-	}
 
 	public FunctionReservation getFunctionReservation() {
 		return functionReservation;
@@ -76,6 +69,14 @@ public class FunctionChair {
 
 	public void setAvailable(Boolean available) {
 		this.available = available;
+	}
+
+	public Function getFunction() {
+		return function;
+	}
+
+	public void setFunction(Function function) {
+		this.function = function;
 	}
 
 	
