@@ -1,8 +1,8 @@
 spring:
       datasource:
-                url: jdbc:postgresql://localhost:5432/cineTest
-                username: postgres
-                password: whatisbeyond
+                url: postgres://knightel98:FqikQEsWq6uyNoI5JCL5lieKQ9jXHDYA@dpg-cmjq8rfqd2ns73bkjh1g-a.frankfurt-postgres.render.com/cinepop_db
+                username: knightel98
+                password: FqikQEsWq6uyNoI5JCL5lieKQ9jXHDYA
                 driver-class-name: org.postgresql.Driver
       jpa:
           database-platform: org.hibernate.dialect.PostgreSQLDialect
