@@ -1,0 +1,6 @@
+services:
+  - type: web
+    name: my-spring-boot-app
+    env: java
+    build_command: ./mvnw clean install
+    start_command: java -jar target/your-spring-boot-app.jar
