@@ -181,7 +181,11 @@ public class FuntionReservationController {
 	
 	@GetMapping("getReservesPages")
 	public ResponseEntity<?> getMyUniqueReservePage (@PageableDefault(page = 0, size = 1) Pageable pageable, @PathVariable Long idUser) {
-		return ResponseEntity.ok(this.functionReservationRepository.findAll(pageable));
+		MyUser user = this.myUserService.findById(idUser);
+		if (user == null)
+			return ResponseEntity.ok("el usuario no existe");
+		
+		return ResponseEntity.ok(this.functionReservationRepository.findByMyUser(user, pageable));
 	}
 
 	@GetMapping("list")

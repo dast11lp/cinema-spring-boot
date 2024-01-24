@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,6 +25,9 @@ import com.cinema.demo.models.LoginCredentials;
 import com.cinema.demo.security.JWTUtil;
 import com.cinema.demo.services.MyUserService;
 import com.cinema.demo.services.RoleService;
+
+
+
 
 @RestController
 @RequestMapping("/auth")
@@ -76,32 +80,29 @@ public class AuthController {
 	
 	
 	@PostMapping("/login")
-	public ResponseEntity<?> loginHandler (@RequestBody LoginCredentials body){
-			
-			try {
-				UsernamePasswordAuthenticationToken authInputToken = new UsernamePasswordAuthenticationToken(body.getUsername(), body.getPassword());
-				
-				MyUser user = myUserService.findByUser(body.getUsername());
-				
-				this.authenticationManager.authenticate(authInputToken);
-				
-				HttpHeaders headers = new HttpHeaders();
-				
-				String token = jwtUtil.JwtGenerator(body.getUsername());
-				
-				Map<String, Object> userInfo = new HashMap<>();
-				userInfo.put("Authorization", token);
-				
-				userInfo.put("userData", user);
-				
-				headers.set("Authorization", token);
-				
-				
+	public ResponseEntity<?> loginHandler(@RequestBody LoginCredentials body) {
+	    try {
+	        UsernamePasswordAuthenticationToken authInputToken = new UsernamePasswordAuthenticationToken(body.getUsername(), body.getPassword());
 
-				return  ResponseEntity.ok().headers(headers).body(userInfo);
-			} catch (Exception e) {
-				log.error(e.toString());
-				return ResponseEntity.ok().body("Usuario o Contraseña incorrectos");
-			}
+	        MyUser user = myUserService.findByUser(body.getUsername());
+
+	        this.authenticationManager.authenticate(authInputToken);
+
+	        HttpHeaders headers = new HttpHeaders();
+
+	        String token = jwtUtil.JwtGenerator(body.getUsername());
+
+	        Map<String, Object> userInfo = new HashMap<>();
+	        userInfo.put("Authorization", token);
+	        userInfo.put("userData", user);
+
+	        headers.set("Authorization", token);
+
+	        return ResponseEntity.ok().headers(headers).body(userInfo);
+	    } catch (Exception e) {
+	        log.error(e.toString());
+	        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Usuario o Contraseña incorrectos");
+	    }
 	}
+
 }
