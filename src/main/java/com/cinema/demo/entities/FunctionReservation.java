@@ -41,7 +41,7 @@ public class FunctionReservation {
 
 	@JsonIgnoreProperties({ "reservationFuntions", "hibernateLazyInitializer", "handler" })
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "id_fun")
+	@JoinColumn(name = "id_fun_mov")
 	private FunctionMovie functionMovie;
 
 	@JsonIgnoreProperties({ "functionReservation", "hibernateLazyInitializer", "handler" })

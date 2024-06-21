@@ -40,89 +40,61 @@ public class Function {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "function")
 	private List<FunctionMovie> listFunctionMovie;
 	
-	
-	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, mappedBy = "function")
 	@OrderBy("number_cha ASC")
 	private List<FunctionChair >functionChairs ;
-
-
 
 	public Integer getId() {
 		return id;
 	}
 
-
-
 	public void setId(Integer id) {
 		this.id = id;
 	}
-
-
 
 	public String getHourTime() {
 		return hourTime;
 	}
 
-
-
 	public void setHourTime(String hourTime) {
 		this.hourTime = hourTime;
 	}
-
-
 
 	public String getDate() {
 		return date;
 	}
 
-
-
 	public void setDate(String date) {
 		this.date = date;
 	}
-
-
 
 	public String getRoom() {
 		return room;
 	}
 
-
-
 	public void setRoom(String room) {
 		this.room = room;
 	}
-
-
 
 	public Double getPriceTicket() {
 		return priceTicket;
 	}
 
-
-
 	public void setPriceTicket(Double priceTicket) {
 		this.priceTicket = priceTicket;
 	}
-
-
 
 	public List<FunctionMovie> getListFunctionMovie() {
 		return listFunctionMovie;
 	}
 
-
-
 	public void setListFunctionMovie(List<FunctionMovie> listFunctionMovie) {
 		this.listFunctionMovie = listFunctionMovie;
 	}
 
-
 	public List<FunctionChair> getFunctionChairs() {
 		return functionChairs;
 	}
-
 
 	public void setFunctionChairs(List<FunctionChair> functionChairs) {
 		this.functionChairs = functionChairs;
