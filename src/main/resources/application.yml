@@ -18,8 +18,3 @@ spring:
       jackson:
         time-zone: UTC
         date-format: yyyy-MM-dd'T'HH:mm:ss.SSSZ
-logging:
-        level:
-              org:
-                  hibernate:
-                            SQL: DEBUG
